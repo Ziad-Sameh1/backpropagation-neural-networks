@@ -28,10 +28,6 @@ def forward_propagation(inputs, hidden_layer_weights, output_layer_weights, hidd
     x = []
     for neuron in range(Constants.OUTPUT_NEURONS_CNT):
         if is_biased:
-            print("base_inputs", base_inputs)
-            print("output_layer_weights", output_layer_weights)
-            print("output_layer_bias", output_layer_bias)
-            print("neuron", neuron)
             x.append(apply_activation_func(activation_func, get_neuron_net(len(base_inputs), base_inputs,
                                                                            output_layer_weights[0][neuron]) +
                                            output_layer_bias[0][neuron]))
@@ -41,8 +37,8 @@ def forward_propagation(inputs, hidden_layer_weights, output_layer_weights, hidd
     base_inputs = x
     outputs.append(base_inputs)
 
-    print("outputs")
-    print(outputs)
+    # print("outputs")
+    # print(outputs)
 
     """
         [
@@ -108,8 +104,8 @@ def back_propagate(actual, target, activation_func, number_of_neurons_per_hidden
 
     hidden_errors.append(outputs_errors)
 
-    print("hidden_errors")
-    print(hidden_errors)
+    # print("hidden_errors")
+    # print(hidden_errors)
 
     """
         [
@@ -300,9 +296,9 @@ def split_weights_and_bias(merged, number_of_layers, number_of_neurons):
 def split_output_weights_and_bias(merged, output_cnt):
     res = []
     for neuron in range(output_cnt):
-        res.append([merged[neuron][-1]])
+        res.append(merged[neuron][-1])
         merged[neuron].pop()
-    return [merged], res
+    return [merged], [res]
 
 
 def train_neural_network(inputs, output, number_of_hidden_layers, number_of_neurons_per_hidden_layer, learning_rate,
@@ -319,11 +315,13 @@ def train_neural_network(inputs, output, number_of_hidden_layers, number_of_neur
     last_output_bias = output_layer_bias
 
     for epoch in range(epochs):
-        print("input")
-        print("last_hidden_weights", last_hidden_weights)
-        print("last_output_weights", last_output_weights)
-        print("last_hidden_bias", last_hidden_bias)
-        print("last_output_bias", last_output_bias)
+        # print("input")
+        # print("last_hidden_weights", last_hidden_weights)
+        # print("last_output_weights", last_output_weights)
+        # print("last_hidden_bias", last_hidden_bias)
+        # print("last_output_bias", last_output_bias)
+
+        print('========== Epoch#', epoch)
 
         unreversed_hidden_weights = last_hidden_weights.copy()
         unreversed_output_weights = last_output_weights.copy()
@@ -347,9 +345,19 @@ def train_neural_network(inputs, output, number_of_hidden_layers, number_of_neur
                                                                        number_of_neurons_per_hidden_layer)
         last_output_weights, last_output_bias = split_output_weights_and_bias(last_output_weights,
                                                                               Constants.OUTPUT_NEURONS_CNT)
+        #
+        # print("output")
+        # print("last_hidden_weights", last_hidden_weights)
+        # print("last_output_weights", last_output_weights)
+        # print("last_hidden_bias", last_hidden_bias)
+        # print("last_output_bias", last_output_bias)
 
-        print("output")
-        print("last_hidden_weights", last_hidden_weights)
-        print("last_output_weights", last_output_weights)
-        print("last_hidden_bias", last_hidden_bias)
-        print("last_output_bias", last_output_bias)
+        print(actual_outputs)
+
+        return last_hidden_weights, last_hidden_bias, last_output_weights, last_output_bias
+
+
+def test_neural_network(x_test, y_test, is_biased, activation_func):
+    N = len(x_test.index.tolist())
+    for i in range(N):
+        train_neural_network(x_test.iloc[i], y_test[i], 4, 5, 0.1, 1000, is_biased, activation_func)
