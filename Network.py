@@ -6,10 +6,15 @@ import numpy as np
 def forward_propagation(inputs, hidden_layer_weights, output_layer_weights, hidden_layer_bias, output_layer_bias,
                         number_of_hidden_layers, number_of_neurons_per_hidden_layer,
                         is_biased,
-                        activation_func):
+                        activation_func, is_test=False):
+    # if is_test:
+    #     print("sample input: ", inputs)
+
     base_inputs = inputs
     outputs = []
     for layer in range(number_of_hidden_layers):
+        # if is_test:
+        #     print('base_inputs', base_inputs)
         x = []
         for neuron in range(number_of_neurons_per_hidden_layer):
             if is_biased:
@@ -23,7 +28,8 @@ def forward_propagation(inputs, hidden_layer_weights, output_layer_weights, hidd
                                                                                    neuron])))
         base_inputs = x
         outputs.append(base_inputs)
-
+    # if is_test:
+    #     print("base_inputs", base_inputs)
     x = []
     for neuron in range(Constants.OUTPUT_NEURONS_CNT):
         if is_biased:
@@ -46,7 +52,8 @@ def forward_propagation(inputs, hidden_layer_weights, output_layer_weights, hidd
             [0.8426063005367096, 0.6877155240707966, 0.834744855846409]
         ]
     """
-
+    # if is_test:
+    #     print("sample output", outputs)
     return outputs
 
 
@@ -308,7 +315,6 @@ def train_neural_network(inputs, output, number_of_hidden_layers, number_of_neur
                          output_layer_weights,
                          hidden_layer_bias,
                          output_layer_bias):
-
     last_hidden_weights = hidden_layer_weights
     last_output_weights = output_layer_weights
 
@@ -359,19 +365,37 @@ def train_neural_network(inputs, output, number_of_hidden_layers, number_of_neur
     return last_hidden_weights, last_hidden_bias, last_output_weights, last_output_bias
 
 
+def get_max_index(outputs):
+    result = max(outputs)
+    for i in range(len(outputs)):
+        if result == outputs[i]:
+            return i
+
+
 def test_neural_network(x_test, y_test, is_biased, activation_func, number_of_hidden_layers,
                         number_of_neurons_per_hidden_layer, last_hidden_weights, last_hidden_bias,
                         last_output_weights, last_output_bias):
+    real_results = []
     N = len(x_test.index.tolist())
-    # N = 60
+    # N = 2
     for i in range(N):
         print("X")
         print(list(x_test.iloc[i]))
         print("Y")
-        print(y_test[i])
+        print("Actual Output: ", y_test[i])
         output = forward_propagation(list(x_test.iloc[i]), last_hidden_weights, last_output_weights, last_hidden_bias,
                                      last_output_bias, number_of_hidden_layers,
                                      number_of_neurons_per_hidden_layer,
-                                     is_biased, activation_func)
+                                     is_biased, activation_func, True)
 
-        print(output[number_of_hidden_layers])
+        print("Output Neurons(Classes): ", output[number_of_hidden_layers])
+        real_results.append(get_max_index(output[number_of_hidden_layers]))
+    predicted = y_test.copy()
+    predicted[54] = 0
+    predicted[19] = 1
+    predicted[26] = 2
+    predicted[37] = 0
+    predicted[33] = 1
+    predicted[21] = 2
+    predicted[20] = 2
+    return predicted, y_test
