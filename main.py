@@ -1,5 +1,4 @@
 import Network
-from gui import draw
 from FileInput import import_excel
 from Preprocessing import get_train_test
 
@@ -9,10 +8,16 @@ df = import_excel()
 
 x_train, y_train, x_test, y_test = get_train_test(df)
 
-# print(x_train.iloc[0])
+sample_features = x_train.iloc[0].tolist()
+sample_y = y_train[0]
 
-Network.train_neural_network([0, 0], 1, 1, 2, 0.001, 11, True, 'sigmoid')
+print("sample input")
+print(sample_features)
+print(sample_y)
 
+Network.train_neural_network(sample_features, sample_y, 4, 4, 0.001, 1, True, 'sigmoid')
+
+# NN.initialize_maps(1,2, 1, True)
 #####
 # preprocessing:
 # - Normalization
