@@ -17,35 +17,8 @@ def calculate_confusion_matrix(predicted, actual, num_classes=3):
     return matrix
 
 
-def calc_accuracy(predicted, actual):
-    n = len(predicted)
-    correct = 0
-    for i in range(n):
-        if predicted[i] == actual[i]:
-            correct += 1
-    return correct / n * 100
-
-
-def display_accuracy_confusion(predicted, actual):
-    accuracy = calc_accuracy(predicted, actual)
-    accuracy_text = "Tanh Accuracy: {:.2f}%".format(accuracy)
-    print(accuracy_text)
-
-    plt.figure(figsize=(12, 6))
-    # Accuracy plot
-    plt.subplot(1, 2, 1)
-    plt.bar(["Accuracy"], [accuracy], color=['green'])
-    plt.title("Accuracy")
-    plt.ylim(0, 100)
-    plt.text(0, accuracy + 5, accuracy_text, ha='center', va='bottom')
-
-    plt.subplot(1, 2, 2)
-
-    plt.tight_layout()
-    plt.show()
-
-
-def train_and_test(number_hidden_layers, number_neurons, learning_rates, epochs, is_biased, activation_function):
+def train_and_test(number_hidden_layers, number_neurons, number_of_output, learning_rate, epochs, is_biased,
+                   activation_function):
     df = import_excel()
 
     x_train, y_train, x_test, y_test = get_train_test(df)
@@ -55,12 +28,19 @@ def train_and_test(number_hidden_layers, number_neurons, learning_rates, epochs,
     train_N = len(y_train)
 
     last_hidden_weights, last_output_weights, last_hidden_bias, last_output_bias = Network.initialize_weights_and_biases(
-        x_train.iloc[0], number_hidden_layers, number_neurons)
+        x_train.iloc[0], number_of_output, number_hidden_layers, number_neurons)
+
+    print("============= Before Train ===============")
+    print("last_hidden_weights", last_hidden_weights)
+    print("last_hidden_bias", last_hidden_bias)
+    print("last_output_weights", last_output_weights)
+    print("last_output_bias", last_output_bias)
 
     print("Model is Currently Training..")
     for i in range(train_N):
-        last_hidden_weights, last_hidden_bias, last_output_weights, last_output_bias = Network.train_neural_network(
-            x_train.iloc[i], y_train[i], number_hidden_layers, number_neurons, learning_rates, epochs, is_biased,
+        last_hidden_weights, last_output_weights, last_hidden_bias, last_output_bias = Network.train_neural_network(
+            x_train.iloc[i], y_train[i], number_of_output, number_hidden_layers, number_neurons, learning_rate, epochs,
+            is_biased,
             activation_function, last_hidden_weights, last_output_weights,
             last_hidden_bias, last_output_bias)
 
@@ -71,11 +51,11 @@ def train_and_test(number_hidden_layers, number_neurons, learning_rates, epochs,
     print("last_output_bias", last_output_bias)
 
     predicted, actual = Network.test_neural_network(x_test, y_test, is_biased, activation_function,
-                                                    number_hidden_layers, number_neurons,
+                                                    number_hidden_layers, number_neurons, number_of_output,
                                                     last_hidden_weights, last_hidden_bias, last_output_weights,
                                                     last_output_bias)
 
-    display_accuracy_confusion(predicted, actual)
+    # display_accuracy_confusion(predicted, actual)
 
 
 def draw():
@@ -94,7 +74,7 @@ def draw():
         print("Use Bias:", use_bias)
         print("Activation Function:", activation_function)
 
-        train_and_test(hidden_layers, neurons_in_layers, learning_rate, epochs, use_bias, activation_function)
+        train_and_test(hidden_layers, neurons_in_layers, 3, learning_rate, epochs, use_bias, activation_function)
 
     root = tk.Tk()
     root.title("Neural Network Configuration")
